@@ -1,0 +1,3 @@
+/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug/CMakeFiles/HelloGL.dir
+/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug/CMakeFiles/rebuild_cache.dir
