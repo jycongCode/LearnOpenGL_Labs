@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug"
+			"value" : "/Users/kanata/Desktop/LearnOpenGL_Labs/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -479,7 +479,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/kanata/Desktop/LearnOpenGL_Labs/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL"
+			"value" : "/Users/kanata/Desktop/LearnOpenGL_Labs"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -819,7 +819,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "HelloGL"
+			"value" : "LearnOpenGL"
 		},
 		{
 			"name" : "CMAKE_PROJECT_VERSION",
@@ -1178,42 +1178,6 @@
 			"value" : "FALSE"
 		},
 		{
-			"name" : "HelloGL_BINARY_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug"
-		},
-		{
-			"name" : "HelloGL_IS_TOP_LEVEL",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "ON"
-		},
-		{
-			"name" : "HelloGL_SOURCE_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL"
-		},
-		{
 			"name" : "LearnOpenGL_BINARY_DIR",
 			"properties" : 
 			[
@@ -1223,7 +1187,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug"
+			"value" : "/Users/kanata/Desktop/LearnOpenGL_Labs/cmake-build-debug"
 		},
 		{
 			"name" : "LearnOpenGL_IS_TOP_LEVEL",
@@ -1247,7 +1211,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/kanata/Desktop/LearnOpenGL"
+			"value" : "/Users/kanata/Desktop/LearnOpenGL_Labs"
 		}
 	],
 	"kind" : "cache",

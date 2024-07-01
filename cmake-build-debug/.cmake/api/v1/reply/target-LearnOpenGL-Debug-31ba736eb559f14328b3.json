@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "HelloGL"
+			"path" : "LearnOpenGL"
 		}
 	],
 	"backtrace" : 1,
@@ -38,13 +38,31 @@
 			{
 				"command" : 1,
 				"file" : 0,
+				"line" : 26,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 27,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
 				"line" : 28,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 29,
+				"line" : 31,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 32,
 				"parent" : 0
 			},
 			{
@@ -67,12 +85,12 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 5,
-					"path" : "/Users/kanata/Desktop/LearnOpenGL/include"
+					"backtrace" : 8,
+					"path" : "/Users/kanata/Desktop/LearnOpenGL_Labs/include"
 				},
 				{
-					"backtrace" : 5,
-					"path" : "/Users/kanata/Desktop/LearnOpenGL/lib"
+					"backtrace" : 8,
+					"path" : "/Users/kanata/Desktop/LearnOpenGL_Labs/lib"
 				}
 			],
 			"language" : "C",
@@ -91,12 +109,12 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 5,
-					"path" : "/Users/kanata/Desktop/LearnOpenGL/include"
+					"backtrace" : 8,
+					"path" : "/Users/kanata/Desktop/LearnOpenGL_Labs/include"
 				},
 				{
-					"backtrace" : 5,
-					"path" : "/Users/kanata/Desktop/LearnOpenGL/lib"
+					"backtrace" : 8,
+					"path" : "/Users/kanata/Desktop/LearnOpenGL_Labs/lib"
 				}
 			],
 			"language" : "CXX",
@@ -114,7 +132,7 @@
 			]
 		}
 	],
-	"id" : "HelloGL::@6890427a1f51a3e7e1df",
+	"id" : "LearnOpenGL::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -128,44 +146,44 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-Wl,-rpath,/Users/kanata/Desktop/LearnOpenGL/lib",
+				"fragment" : "-Wl,-rpath,/Users/kanata/Desktop/LearnOpenGL_Labs/lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "/Users/kanata/Desktop/LearnOpenGL/lib/libglfw.3.dylib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "/Users/kanata/Desktop/LearnOpenGL/lib/libassimp.3.1.1.dylib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "/Users/kanata/Desktop/LearnOpenGL/lib/libassimp.3.dylib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "/Users/kanata/Desktop/LearnOpenGL/lib/libassimp.dylib",
+				"fragment" : "/Users/kanata/Desktop/LearnOpenGL_Labs/lib/libglfw.3.dylib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "-framework OpenGL",
+				"fragment" : "/Users/kanata/Desktop/LearnOpenGL_Labs/lib/libassimp.3.1.1.dylib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
+				"fragment" : "/Users/kanata/Desktop/LearnOpenGL_Labs/lib/libassimp.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "/Users/kanata/Desktop/LearnOpenGL_Labs/lib/libassimp.3.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "-framework OpenGL",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
 				"fragment" : "-framework Cocoa",
 				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
 	},
-	"name" : "HelloGL",
-	"nameOnDisk" : "HelloGL",
+	"name" : "LearnOpenGL",
+	"nameOnDisk" : "LearnOpenGL",
 	"paths" : 
 	{
 		"build" : ".",

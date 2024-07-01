@@ -150,8 +150,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug",
-		"source" : "/Users/kanata/Desktop/LearnOpenGL"
+		"build" : "/Users/kanata/Desktop/LearnOpenGL_Labs/cmake-build-debug",
+		"source" : "/Users/kanata/Desktop/LearnOpenGL_Labs"
 	},
 	"version" : 
 	{

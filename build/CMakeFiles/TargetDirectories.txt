@@ -1,0 +1,3 @@
+/Users/kanata/Desktop/LearnOpenGL_Labs/build/CMakeFiles/LearnOpenGL.dir
+/Users/kanata/Desktop/LearnOpenGL_Labs/build/CMakeFiles/edit_cache.dir
+/Users/kanata/Desktop/LearnOpenGL_Labs/build/CMakeFiles/rebuild_cache.dir

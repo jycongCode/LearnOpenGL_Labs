@@ -27,7 +27,7 @@
 					[
 						0
 					],
-					"name" : "HelloGL",
+					"name" : "LearnOpenGL",
 					"targetIndexes" : 
 					[
 						0
@@ -38,9 +38,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "HelloGL::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-HelloGL-Debug-161e1ad6482e947de980.json",
-					"name" : "HelloGL",
+					"id" : "LearnOpenGL::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-LearnOpenGL-Debug-31ba736eb559f14328b3.json",
+					"name" : "LearnOpenGL",
 					"projectIndex" : 0
 				}
 			]
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/kanata/Desktop/LearnOpenGL/cmake-build-debug",
-		"source" : "/Users/kanata/Desktop/LearnOpenGL"
+		"build" : "/Users/kanata/Desktop/LearnOpenGL_Labs/cmake-build-debug",
+		"source" : "/Users/kanata/Desktop/LearnOpenGL_Labs"
 	},
 	"version" : 
 	{

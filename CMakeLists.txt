@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18.1)
 
-project(HelloGL VERSION 0.0.1)
+project(LearnOpenGL VERSION 0.0.1)
 
 # 使用 C++ 17 标准
 set(CMAKE_CXX_STANDARD 17)
@@ -19,12 +19,15 @@ set(ASSIMP_LINK_1 ${LIB_DIR}/libassimp.3.dylib)
 set(ASSIMP_LINK_2 ${LIB_DIR}/libassimp.dylib)
 
 set(SOURCES ${SRC_DIR}/glad.c ${SRC_DIR}/main.cpp)
-add_executable(HelloGL ${SOURCES})
-
+add_executable(LearnOpenGL ${SOURCES})
 # 链接GLFW库
-target_link_libraries(HelloGL ${GLFW_LINK} ${ASSIMP_LINK_0} ${ASSIMP_LINK_1} ${ASSIMP_LINK_2})
+
+target_link_libraries(LearnOpenGL ${GLFW_LINK})
+target_link_libraries(LearnOpenGL ${ASSIMP_LINK_0})
+target_link_libraries(LearnOpenGL ${ASSIMP_LINK_2})
+target_link_libraries(LearnOpenGL ${ASSIMP_LINK_1})
 # 链接系统的 OpenGL 框架和其他必要的库
 if (APPLE)
-    target_link_libraries(HelloGL "-framework OpenGL")
-    target_link_libraries(HelloGL "-framework Cocoa")
+    target_link_libraries(LearnOpenGL "-framework OpenGL")
+    target_link_libraries(LearnOpenGL "-framework Cocoa")
 endif()
