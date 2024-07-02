@@ -4,6 +4,7 @@
 #include <Shader.h>
 #include <Camera.h>
 #include <Model.h>
+#include <map>
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void VAO_exp();
@@ -495,13 +496,9 @@ void Model_exp(){
     shader.Destroy();
 }
 void Depth_Test_exp(){
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
-
     // build and compile shaders
     // -------------------------
-    Shader shader("../src/Shaders/Adv.vs", "../src/Shaders/Adv.fs");
-    Shader shader1("../src/Shaders/Adv.vs","../src/Shaders/shaderPureColor.fs");
+
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float cubeVertices[] = {
@@ -548,6 +545,17 @@ void Depth_Test_exp(){
             -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+
+    float quadVertices[] = {
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    };
+
+
     float planeVertices[] = {
             // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
             5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
@@ -558,6 +566,14 @@ void Depth_Test_exp(){
             -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
             5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+
+    std::vector<glm::vec3> vegetation;
+    vegetation.push_back(glm::vec3(-0.3f,  0.0f, -2.3f));
+    vegetation.push_back(glm::vec3( 0.5f,  0.0f, -0.6f));
+    vegetation.push_back(glm::vec3(-1.5f,  0.0f, -0.48f));
+    vegetation.push_back(glm::vec3( 1.5f,  0.0f,  0.51f));
+    vegetation.push_back(glm::vec3( 0.0f,  0.0f,  0.7f));
+
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -582,14 +598,33 @@ void Depth_Test_exp(){
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
-
+    // quad VAO
+    unsigned int quadVAO,quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
     // load textures
     // -------------
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     unsigned int cubeTexture  = loadTexture("../img/container2.png");
     unsigned int floorTexture = loadTexture("../img/wall.jpg");
-
+    unsigned int windowTexture = loadTexture("../img/blending_transparent_window.png");
     // shader configuration
     // --------------------
+    Shader shader("../src/Shaders/Adv.vs", "../src/Shaders/Adv.fs");
+//    Shader shader1("../src/Shaders/Adv.vs","../src/Shaders/shaderPureColor.fs");
+
     shader.use();
     shader.setInt("texture1", 0);
 
@@ -601,44 +636,51 @@ void Depth_Test_exp(){
         // --------------------
         updateTime();
         processInput(window);
-
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        glEnable(GL_STENCIL_TEST);
-        glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
-        glStencilMask(0xFF);
-        shader.use();
-        glm::mat4 model = glm::mat4(1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)800 / (float)600, 0.1f, 100.0f);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        // cubes
-        glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glStencilFunc(GL_NOTEQUAL,1,0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_STENCIL_TEST);
-        shader1.use();
-
         // floor
+        shader.use();
+        shader.setMat4("view",view);
+        shader.setMat4("projection",projection);
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         shader.setMat4("model", glm::mat4(1.0f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+        // cubes
+        shader.use();
+        glm::mat4 model_cube = glm::mat4(1.0f);
+        glBindVertexArray(cubeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        model_cube = glm::translate(model_cube, glm::vec3(-1.0f, 0.0f, -1.0f));
+        shader.setMat4("model", model_cube);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        model_cube = glm::mat4(1.0f);
+        model_cube = glm::translate(model_cube, glm::vec3(2.0f, 0.0f, 0.0f));
+        shader.setMat4("model", model_cube);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+
+//        // windows
+        std::map<float,glm::vec3> sorted;
+        for(unsigned int i = 0;i<vegetation.size();++i){
+            float distance = glm::length(camera.Position-vegetation[i]);
+            sorted[distance] = vegetation[i];
+        }
+        glm::mat4 model_window;
+        glBindVertexArray(quadVAO);
+        glBindTexture(GL_TEXTURE_2D,windowTexture);
+        for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin();it!=sorted.rend();++it){
+            model_window = glm::mat4(1.0f);
+            model_window = glm::translate(model_window,it->second);
+            shader.setMat4("model",model_window);
+            glDrawArrays(GL_TRIANGLES,0,6);
+        }
+        glBindVertexArray(0);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -649,7 +691,6 @@ void Depth_Test_exp(){
     glDeleteVertexArrays(1, &planeVAO);
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &planeVBO);
-
     glfwTerminate();
 }
 
@@ -727,3 +768,5 @@ void scroll_callback(GLFWwindow* window,double xoffset,double yoffset){
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 // endregion
+
+
