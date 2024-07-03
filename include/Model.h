@@ -92,6 +92,10 @@ private:
             std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
                                                                      "texture_specular");
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+            std::vector<Texture> reflectMaps = loadMaterialTextures(material,aiTextureType_AMBIENT,"texture_reflect");
+            textures.insert(textures.end(), reflectMaps.begin(), reflectMaps.end());
+            std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+            textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         }
         return Mesh(vertices,indices,textures);
     }
