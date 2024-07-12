@@ -18,7 +18,10 @@ set(ASSIMP_LINK_0 ${LIB_DIR}/libassimp.3.1.1.dylib)
 set(ASSIMP_LINK_1 ${LIB_DIR}/libassimp.3.dylib)
 set(ASSIMP_LINK_2 ${LIB_DIR}/libassimp.dylib)
 
-set(SOURCES ${SRC_DIR}/glad.c ${SRC_DIR}/main.cpp)
+set(SOURCES ${SRC_DIR}/glad.c ${SRC_DIR}/main.cpp
+        include/Cube.h
+        include/Quad.h
+        include/Plane.h)
 add_executable(LearnOpenGL ${SOURCES})
 # 链接GLFW库
 

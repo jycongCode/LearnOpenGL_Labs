@@ -28,8 +28,8 @@ public:
             meshes[i].Destroy();
         }
     }
-private:
     std::vector<Mesh> meshes;
+private:
     std::string directory;
     void loadModel(std::string path){
         Assimp::Importer importer;
@@ -94,8 +94,6 @@ private:
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
             std::vector<Texture> reflectMaps = loadMaterialTextures(material,aiTextureType_AMBIENT,"texture_reflect");
             textures.insert(textures.end(), reflectMaps.begin(), reflectMaps.end());
-            std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-            textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         }
         return Mesh(vertices,indices,textures);
     }

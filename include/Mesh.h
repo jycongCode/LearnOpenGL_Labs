@@ -46,9 +46,7 @@ public :
             else if(name == "texture_specular")
                 number = std::to_string(specularNr++);
             else if(name == "texture_reflect")
-                number = std::to_string(reflectNr);
-            else if(name == "texture_normal")
-                number = std::to_string(normalNr++);
+                number = std::to_string(reflectNr++);
             shader.setInt(("material."+name+number),i);
             glBindTexture(GL_TEXTURE_2D,textures[i].id);
         }
@@ -66,9 +64,9 @@ public :
             glDeleteTextures(1,&textures[i].id);
         }
     }
-
+    unsigned int VAO;
 private:
-    unsigned int VAO,VBO,EBO;
+    unsigned int VBO,EBO;
     void setupMesh(){
         glGenVertexArrays(1,&VAO);
         glGenBuffers(1,&VBO);
