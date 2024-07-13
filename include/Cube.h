@@ -97,6 +97,19 @@ public:
         glBindVertexArray(0);
     }
 
+    void Draw(Shader shader,glm::mat4 model,GLuint texture, GLuint normalMap){
+        shader.use();
+        shader.setMat4("model",model);
+        shader.setInt("texture0",0);
+        shader.setInt("normalMap",1);
+        glBindVertexArray(cubeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D,normalMap);
+        glDrawArrays(GL_TRIANGLES,0,36);
+        glBindVertexArray(0);
+    }
     void Destroy(){
         glDeleteVertexArrays(1,&cubeVAO);
         glDeleteBuffers(1,&cubeVBO);

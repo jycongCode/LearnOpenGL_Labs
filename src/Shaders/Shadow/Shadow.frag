@@ -21,8 +21,27 @@ float ShadowCalculation(vec3 fragPos)
     closestDepth *= farPlane;
     float currentDepth = length(fragToLight);
     vec3 normal = normalize(fs_in.Normal);
-    float bias = max(0.05,min((1.0-dot(normal,-fragToLight)),0.5));
-    float shadow = currentDepth-bias > closestDepth? 1.0 : 0.0;
+    float bias = 0.05;
+    vec3 sampleOffsetDirections[20] = vec3[]
+    (
+        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+        vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+        vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+        vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+    );
+    float shadow = 0.0;
+    float diskRadius = (1.0 + (length(fragToLight) / farPlane)) / 25.0;
+    int samples = 20;
+    float viewDistance = length(viewPos - fragPos);
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(shadowMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+        closestDepth *= farPlane;   // Undo mapping [0;1]
+        if(currentDepth - bias >= closestDepth)
+        shadow += 1.0;
+    }
+    shadow /= float(samples);
     return shadow;
 }
 
@@ -30,9 +49,9 @@ void main()
 {
     vec3 color = texture(texture0, fs_in.TexCoords).rgb;
     vec3 normal = normalize(fs_in.Normal);
-    vec3 lightColor = vec3(1.0);
+    vec3 lightColor = vec3(0.3);
     // Ambient
-    vec3 ambient = 0.15 * color;
+    vec3 ambient = 0.3 * color;
     // Diffuse
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
@@ -44,7 +63,7 @@ void main()
     vec3 halfwayDir = normalize(lightDir + viewDir);
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
     vec3 specular = spec * lightColor;
-    // 计算阴影
+    // Calculate shadow
     float shadow = ShadowCalculation(fs_in.FragPos);
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
 

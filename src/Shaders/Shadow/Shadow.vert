@@ -11,6 +11,7 @@ out VS_OUT {
     vec2 TexCoords;
 } vs_out;
 
+uniform int reverse_normals;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
@@ -19,6 +20,9 @@ void main()
 {
     gl_Position = projection * view * model * vec4(position, 1.0f);
     vs_out.FragPos = vec3(model * vec4(position, 1.0));
-    vs_out.Normal = transpose(inverse(mat3(model))) * normal;
+    if(reverse_normals == 1)
+        vs_out.Normal = transpose(inverse(mat3(model))) * -normal;
+    else
+        vs_out.Normal = transpose(inverse(mat3(model))) * normal;
     vs_out.TexCoords = texCoords;
 }
