@@ -132,7 +132,7 @@ public:
         glAttachShader(this->ID,vertexShader);
         glAttachShader(this->ID,fragmentShader);
 
-        if(geometryPath.size()){
+        if(hasGeom){
             std::string geometryCode;
             std::ifstream geometryFile;
             geometryFile.exceptions(std::ifstream ::failbit|std::ifstream ::badbit);

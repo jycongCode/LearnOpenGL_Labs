@@ -33,7 +33,7 @@ private:
     std::string directory;
     void loadModel(std::string path){
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(path,aiProcess_Triangulate|aiProcess_FlipUVs);
+        const aiScene* scene = importer.ReadFile(path,aiProcess_Triangulate|aiProcess_FlipUVs|aiProcess_CalcTangentSpace);
         if(!scene||scene->mFlags&AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
             std::cout << "ERROR::ASSIMP::"<<importer.GetErrorString() << std::endl;
         }
@@ -66,6 +66,10 @@ private:
             vector.y = mesh->mNormals[i].y;
             vector.z = mesh->mNormals[i].z;
             vertex.Normal = vector;
+            vector.x = mesh->mTangents[i].x;
+            vector.y = mesh->mTangents[i].y;
+            vector.z = mesh->mTangents[i].z;
+            vertex.Tangent = vector;
             if(mesh->mMaterialIndex >= 0){
                 // process materials
                 glm::vec2 vec;
@@ -86,14 +90,18 @@ private:
 
         if(mesh->mMaterialIndex >=0) {
             aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-            std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+            std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE,
+                                                                    "texture_diffuse");
             textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
             std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
                                                                      "texture_specular");
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-            std::vector<Texture> reflectMaps = loadMaterialTextures(material,aiTextureType_AMBIENT,"texture_reflect");
+            std::vector<Texture> reflectMaps = loadMaterialTextures(material,aiTextureType_AMBIENT,
+                                                                    "texture_reflect");
             textures.insert(textures.end(), reflectMaps.begin(), reflectMaps.end());
+            std::vector<Texture> normalMaps = loadMaterialTextures(material,aiTextureType_HEIGHT,
+                                                                   "texture_normal");
+            textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         }
         return Mesh(vertices,indices,textures);
     }

@@ -12,6 +12,7 @@ struct Vertex{
     glm::vec3 Position;
     glm::vec3 Normal;
     glm::vec2 TexCoords;
+    glm::vec3 Tangent;
 };
 
 struct Texture{
@@ -47,6 +48,9 @@ public :
                 number = std::to_string(specularNr++);
             else if(name == "texture_reflect")
                 number = std::to_string(reflectNr++);
+            else if(name == "texture_normal")
+                number = std::to_string(normalNr++);
+//            std::cout << "texture loaded:" << name << number << std::endl;
             shader.setInt(("material."+name+number),i);
             glBindTexture(GL_TEXTURE_2D,textures[i].id);
         }
@@ -85,6 +89,8 @@ private:
         glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(offsetof(Vertex,Normal)));
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(offsetof(Vertex,TexCoords)));
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(offsetof(Vertex,Tangent)));
 
         glBindVertexArray(0);
     }
