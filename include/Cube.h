@@ -79,9 +79,9 @@ public:
         shader.setMat4("view",view);
         shader.setMat4("projection",projection);
         shader.setInt("texture0",0);
-        glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,texture);
+        glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
     }
