@@ -31,6 +31,7 @@ void renderQuad();
 void NormalMap_Test();
 void Parallax_Test();
 void HDR_Test();
+void Bloom_Test();
 //window
 GLFWwindow* window = NULL;
 const int screenWidth = 1000;
@@ -55,7 +56,7 @@ glm::vec3 lightPos(1.2f,1.0f,2.0f);
 int main()
 {
     glfw_Init();
-    HDR_Test();
+    Bloom_Test();
     glfwTerminate();
     return 0;
 }
@@ -1178,6 +1179,159 @@ void HDR_Test(){
     quad.Destroy();
     hdrShader.Destroy();
     shader.Destroy();
+}
+void Bloom_Test(){
+    glEnable(GL_DEPTH_TEST);
+    unsigned int hdrFBO;
+    glGenFramebuffers(1,&hdrFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER,hdrFBO);
+    unsigned int colorBuffers[2];
+    glGenTextures(2,colorBuffers);
+    for(unsigned int i = 0;i<2;++i){
+        glBindTexture(GL_TEXTURE_2D,colorBuffers[i]);
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA16F,screenWidth,screenHeight,0,GL_RGBA,GL_FLOAT,NULL);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0 + i,GL_TEXTURE_2D,colorBuffers[i],0);
+    }
+    unsigned int rboDepth;
+    glGenRenderbuffers(1,&rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER,rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH24_STENCIL8,screenWidth,screenHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_STENCIL_ATTACHMENT,GL_RENDERBUFFER,rboDepth);
+
+    unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Framebuffer not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+    unsigned int pingpongFBO[2];
+    unsigned int pingpongBuffer[2];
+    glGenFramebuffers(2,pingpongFBO);
+    glGenTextures(2,pingpongBuffer);
+    for(unsigned int i = 0;i<2;++i){
+        glBindFramebuffer(GL_FRAMEBUFFER,pingpongFBO[i]);
+        glBindTexture(GL_TEXTURE_2D,pingpongBuffer[i]);
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA16F,screenWidth,screenHeight,0,GL_RGBA,GL_FLOAT,NULL);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,pingpongBuffer[i],0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Framebuffer not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
+    }
+
+    std::vector<glm::vec3> lightPositions;
+    lightPositions.push_back(glm::vec3( 0.0f, 0.5f,  1.5f));
+    lightPositions.push_back(glm::vec3(-4.0f, 0.5f, -3.0f));
+    lightPositions.push_back(glm::vec3( 3.0f, 0.5f,  1.0f));
+    lightPositions.push_back(glm::vec3(-.8f,  2.4f, -1.0f));
+    // colors
+    std::vector<glm::vec3> lightColors;
+    lightColors.push_back(glm::vec3(5.0f,   5.0f,  5.0f));
+    lightColors.push_back(glm::vec3(10.0f,  0.0f,  0.0f));
+    lightColors.push_back(glm::vec3(0.0f,   0.0f,  15.0f));
+    lightColors.push_back(glm::vec3(0.0f,   5.0f,  0.0f));
+
+    Shader shader("Cube");
+    Shader shaderBlur("Blur");
+    Shader shaderLight("LightSource");
+    Shader shaderHDR("HDR");
+
+    GLuint cubeTex = loadTexture("../img/container2.png",true);
+    GLuint floorTex = loadTexture("../img/wall.jpg", true);
+    glm::mat4 projection = glm::perspective(camera.Zoom,(float)screenWidth / (float)screenHeight,0.1f,100.0f);
+    glm::mat4 model;
+    Cube cube;
+    Quad quad(screenWidth,screenHeight);
+    while(!glfwWindowShouldClose(window)){
+        updateTime();
+        processInput(window);
+
+        glEnable(GL_DEPTH_TEST);
+        glm::mat4 view = camera.GetViewMatrix();
+        glBindFramebuffer(GL_FRAMEBUFFER,hdrFBO);
+        ClearScreen();
+        shader.use();
+        for (unsigned int i = 0; i < lightPositions.size(); i++)
+        {
+            shader.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
+            shader.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+        }
+        shader.setVec3("viewPos", camera.Position);
+        // create one large cube that acts as the floor
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0));
+        model = glm::scale(model, glm::vec3(12.5f, 0.5f, 12.5f));
+        cube.Draw(shader,model,view,projection,floorTex);
+        // then create multiple cubes as the scenery
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
+        model = glm::scale(model, glm::vec3(0.5f));
+        cube.Draw(shader,model,view,projection,cubeTex);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
+        model = glm::scale(model, glm::vec3(0.5f));
+        cube.Draw(shader,model,view,projection,cubeTex);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, -1.0f, 2.0));
+        model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+        cube.Draw(shader,model,view,projection,cubeTex);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 2.7f, 4.0));
+        model = glm::rotate(model, glm::radians(23.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+        model = glm::scale(model, glm::vec3(1.25));
+        cube.Draw(shader,model,view,projection,cubeTex);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-2.0f, 1.0f, -3.0));
+        model = glm::rotate(model, glm::radians(124.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+        cube.Draw(shader,model,view,projection,cubeTex);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.0f, 0.0f, 0.0));
+        model = glm::scale(model, glm::vec3(0.5f));
+        cube.Draw(shader,model,view,projection,cubeTex);
+
+        shaderLight.use();
+        for (unsigned int i = 0; i < lightPositions.size(); i++)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(lightPositions[i]));
+            model = glm::scale(model, glm::vec3(0.25f));
+            shaderLight.setVec3("lightColor", lightColors[i]);
+            cube.Draw(shaderLight,model,view,projection,0);
+        }
+        glDisable(GL_DEPTH_TEST);
+//
+        shaderBlur.use();
+        bool horizontal = true,firstIteration = true;
+        for(int i = 0;i<10;++i){
+            shaderBlur.setBool("horizontal",horizontal);
+            glBindFramebuffer(GL_FRAMEBUFFER,pingpongFBO[horizontal]);
+            GLuint texture = firstIteration ? colorBuffers[1] : pingpongBuffer[!horizontal];
+            quad.Draw(shaderBlur,texture);
+            if(firstIteration)
+                firstIteration = false;
+            horizontal = !horizontal;
+        }
+//
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderHDR.use();
+        shaderHDR.setBool("hdr",hdr);
+        shaderHDR.setFloat("exposure", exposure);
+        shaderHDR.setInt("texture1",1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D,pingpongBuffer[0]);
+        quad.Draw(shaderHDR,colorBuffers[0]);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 }
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
