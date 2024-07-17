@@ -68,9 +68,30 @@ public:
         glDisable(GL_DEPTH_TEST);
         glBindVertexArray(quadVAO);
         shader.use();
-        shader.setInt("texture0",0);
+        if(texture!=0){
+            shader.setInt("texture0",0);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D,texture);
+        }
+        glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+        glBindVertexArray(0);
+    }
+
+    void DDraw(Shader shader,GLuint gPosition,GLuint gNormal,GLuint gColorSpec){
+        glDisable(GL_DEPTH_TEST);
+        glBindVertexArray(quadVAO);
+        shader.use();
+        shader.setInt("gPosition",0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,texture);
+        glBindTexture(GL_TEXTURE_2D,gPosition);
+
+        shader.setInt("gNormal",1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D,gNormal);
+
+        shader.setInt("gColorSpec",2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D,gColorSpec);
         glDrawArrays(GL_TRIANGLE_STRIP,0,4);
         glBindVertexArray(0);
     }
