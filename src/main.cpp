@@ -9,18 +9,19 @@
 #include "Cube.h"
 #include "Plane.h"
 #include "Quad.h"
+#include "Sphere.h"
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void VAO_exp();
 void Texture_exp();
-void
-Model_exp();
+void Model_exp();
 void Light_exp();
 void Depth_Test_exp();
 void Instance_Test();
 void Geometry_Test();
 void MSAA_Test();
 void Shadow_Test();
+void PBR_Test();
 int glfw_Init();
 void mouse_callback(GLFWwindow* window,double xpos,double ypos);
 void scroll_callback(GLFWwindow* window,double xoffset,double yoffset);
@@ -59,7 +60,7 @@ glm::vec3 lightPos(1.2f,1.0f,2.0f);
 int main()
 {
     glfw_Init();
-    Deferred_Test();
+    PBR_Test();
     glfwTerminate();
     return 0;
 }
@@ -1468,6 +1469,7 @@ void Deferred_Test() {
     Quad quad(screenWidth, screenHeight);
     Cube cube;
     glm::mat4 model;
+    GLuint floorTex = loadTexture("../img/wall.jpg");
     while (!glfwWindowShouldClose(window)) {
         updateTime();
         processInput(window);
@@ -1481,10 +1483,10 @@ void Deferred_Test() {
         model = glm::translate(model, glm::vec3(0.0, 7.0f, 0.0f));
         model = glm::scale(model, glm::vec3(7.5f, 7.5f, 7.5f));
         shaderBackpack.setBool("iNormals",true);
-        shaderBackpack.setBool("pure",true);
-        cube.Draw(shaderBackpack,model,view,projection,0);
+        shaderBackpack.setBool("pure", true);
+        cube.Draw(shaderBackpack,model,view,projection,floorTex);
         shaderBackpack.setBool("iNormals", false);
-        shaderBackpack.setBool("pure",false);
+        shaderBackpack.setBool("pure",true);
         // backpack model on the floor
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0));
@@ -1495,6 +1497,9 @@ void Deferred_Test() {
         backpack.Draw(shaderBackpack);
 
         glDisable(GL_DEPTH_TEST);
+        // Test
+//        glBindFramebuffer(GL_FRAMEBUFFER,0);
+//        quad.Draw(shaderQuad,gColorSpec);
         glBindFramebuffer(GL_FRAMEBUFFER,ssaoFBO);
         shaderSSAO.use();
         shaderSSAO.setInt("gPosition",0);
@@ -1514,7 +1519,7 @@ void Deferred_Test() {
         quad.Draw(shaderBlur,ssaoBuffer);
 
         glBindFramebuffer(GL_FRAMEBUFFER,0);
-        quad.Draw(shaderQuad,gColorSpec);
+        shaderDeferred.use();
         glm::vec3 lightPos = glm::vec3(2.0, 4.0, -2.0);
         glm::vec3 lightColor = glm::vec3(0.2, 0.2, 0.7);
         glm::vec3 lightPosView = glm::vec3(camera.GetViewMatrix() * glm::vec4(lightPos, 1.0));
@@ -1542,7 +1547,7 @@ void Deferred_Test() {
         glActiveTexture(GL_TEXTURE3); // add extra SSAO texture to lighting pass
         glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
         shaderDeferred.setVec3("viewPos",glm::vec3(0.0f));
-        shaderDeferred.setBool("hdr",false);
+        shaderDeferred.setBool("hdr",true);
         shaderDeferred.setFloat("exposure",exposure);
         quad.Draw(shaderDeferred,0);
         glfwSwapBuffers(window);
@@ -1554,6 +1559,73 @@ void Deferred_Test() {
     shaderBackpack.Destroy();
     shaderSSAO.Destroy();
     shaderQuad.Destroy();
+}
+void PBR_Test(){
+    glm::mat4 projection = glm::perspective(camera.Zoom,(float)screenWidth / (float)screenHeight,0.1f,100.0f);
+    Shader shaderPBR("PBR");
+    shaderPBR.use();
+    shaderPBR.setMat4("projection",projection);
+    glm::vec3 lightPositions[] = {
+            glm::vec3(-10.0f,  10.0f, 10.0f),
+            glm::vec3( 10.0f,  10.0f, 10.0f),
+            glm::vec3(-10.0f, -10.0f, 10.0f),
+            glm::vec3( 10.0f, -10.0f, 10.0f),
+    };
+    glm::vec3 lightColors[] = {
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f)
+    };
+
+//    for(unsigned int i = 0;i<4;++i){
+//        shaderPBR.setVec3("lights[" + std::to_string(i) + "].Position",lightPositions[i]);
+//        shaderPBR.setVec3("lights[" + std::to_string(i) + "].Color",lightColors[i]);
+//    }
+    int nrRows    = 7;
+    int nrColumns = 7;
+    float spacing = 2.5;
+
+    Sphere sphere;
+    while(!glfwWindowShouldClose(window)){
+        updateTime();
+        processInput(window);
+        glEnable(GL_DEPTH_TEST);
+        ClearScreen();
+        // render
+        shaderPBR.use();
+        shaderPBR.setMat4("view",camera.GetViewMatrix());
+        shaderPBR.setVec3("viewPos",camera.Position);
+        shaderPBR.setFloat("material.ao",1.0f);
+        shaderPBR.setVec3("material.albedo",0.5f,0.0f,0.0f);
+        glm::mat4 model;
+
+        for (unsigned int i = 0; i < 4; ++i)
+        {
+            glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+            shaderPBR.setVec3("lights[" + std::to_string(i) + "].Position", newPos);
+            shaderPBR.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+        }
+
+        for(int row = 0;row<nrRows;++row){
+            shaderPBR.setFloat("material.metallic",(float) row / (float) nrRows);
+            for(int col = 0;col<nrColumns;++col){
+                shaderPBR.setFloat("material.roughness",glm::clamp((float)col / (float)nrColumns,0.05f,1.0f));
+//                shaderPBR.setFloat("material.roughness",0.3f);
+                model = glm::mat4 (1.0f);
+                model = glm::translate(model,glm::vec3(
+                        (col - (nrColumns)/2.0) * spacing,
+                        (row - (nrRows)/2.0) * spacing,
+                        0.0f
+                        ));
+                shaderPBR.setMat4("model",model);
+                sphere.Draw(shaderPBR);
+            }
+        }
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 }
 unsigned int quadVAO = 0;
 unsigned int quadVBO;

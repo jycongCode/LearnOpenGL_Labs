@@ -26,13 +26,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 25,
-				"parent" : 0
-			},
-			{
-				"command" : 1,
-				"file" : 0,
-				"line" : 28,
+				"line" : 26,
 				"parent" : 0
 			},
 			{
@@ -56,13 +50,19 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 34,
+				"line" : 32,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
 				"line" : 35,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 36,
 				"parent" : 0
 			},
 			{
@@ -205,7 +205,8 @@
 			[
 				2,
 				3,
-				4
+				4,
+				5
 			]
 		}
 	],
@@ -236,6 +237,11 @@
 		{
 			"backtrace" : 1,
 			"path" : "include/Plane.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "include/Sphere.h",
 			"sourceGroupIndex" : 1
 		}
 	],
