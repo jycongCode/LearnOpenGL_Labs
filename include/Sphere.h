@@ -93,6 +93,13 @@ public:
         glBindVertexArray(sphereVAO);
         glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
     }
+    void Destroy(){
+        glDeleteVertexArrays(1,&sphereVAO);
+        glDeleteBuffers(1,&vbo);
+        glDeleteBuffers(1,&ebo);
+        data.clear();
+        indices.clear();
+    }
 private:
     unsigned int sphereVAO;
     unsigned int vbo,ebo;

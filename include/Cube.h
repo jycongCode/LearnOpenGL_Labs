@@ -112,6 +112,13 @@ public:
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
     }
+
+    void Draw(Shader shader){
+        shader.use();
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES,0,36);
+        glBindVertexArray(0);
+    }
     void Destroy(){
         glDeleteVertexArrays(1,&cubeVAO);
         glDeleteBuffers(1,&cubeVBO);
